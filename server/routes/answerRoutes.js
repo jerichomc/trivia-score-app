@@ -53,4 +53,42 @@ router.post('/', async (req, res) => {
   }
 });
 
+//GET /api/answers?round=1 - get all answers for a round
+router.get('/', async (req, res) => {
+    const { round } = req.query;
+
+    if (!round) {
+        return res.status(400).json({ error: 'Round Number is required'})
+    }
+
+    try {
+        //get all answers for the specified round
+        const answers = await Answer.find({ round: Number(round) });
+
+        //group answers by team name
+        const grouped = {};
+
+        answers.forEach(answer => {
+            const team = answer.teamName;
+            if (!grouped[team]) {
+                grouped[team] = [];
+            }
+            grouped[team].push({
+                questionNumber: answer.questionNumber,
+                answerText: answer.answerText,
+                pointsAwarded: answer.pointsAwarded
+            });
+        });
+
+        //sort answers for each team by question number
+        Object.keys(grouped).forEach(team => {
+            grouped[team].sort((a, b) => a.questionNumber - b.questionNumber);
+        });
+        res.json(grouped);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Server error while fetching answers' });
+    }
+});
+
 module.exports = router;
