@@ -2,6 +2,7 @@ const express = require('express'); // Importing the express module
 const mongoose = require('mongoose'); // Importing mongoose for MongoDB interaction
 const cors = require('cors'); // Importing CORS middleware for handling cross-origin requests
 require('dotenv').config(); // Loading environment variables from .env file
+const answerRoutes = require('./routes/answerRoutes'); // Importing answer routes
 
 const app = express(); // Creating an instance of an Express application
 
@@ -13,6 +14,9 @@ app.use(express.json()); // Middleware to parse JSON request bodies
 app.get('/', (req, res) => {
     res.send('API is running');
 });
+
+//use answer routes
+app.use('/api/answer', answerRoutes); // Mounting the answer routes at /api/answer
 
 //connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
@@ -27,3 +31,4 @@ const PORT = process.env.PORT || 5000; // Setting the port to either the environ
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`); // Logging the server start message
 });
+
